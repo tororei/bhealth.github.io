@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mHealth Reminder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #login-container, #app {
+            width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input, button {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #medList {
+            list-style: none;
+            padding: 0;
+        }
+
+        .medicine {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="app" style="display: none;">
+        <h2>Medicine Reminder</h2>
+        <input type="text" id="medicineInput" placeholder="Enter medicine name">
+        <input type="datetime-local" id="reminderTime" placeholder="Set reminder time">
+        <button onclick="addMedicine()">Add Medicine</button>
+        <ul id="medList"></ul>
+    </div>
+
+    <audio id="alarmAudio" src="mixkit-alarm-tone-996.WAV" preload="auto"></audio>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Basic validation
+            if (username === '' || password === '') {
+                alert('Please enter both username and password.');
+                return;
+            }
+
+            // Simulate successful login (you would normally send a request to a server for authentication)
+            alert('Login successful!');
+            
+            // Show the medicine reminder app
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        }
+
+        function addMedicine() {
+            const medicineInput = document.getElementById('medicineInput');
+            const reminderTime = document.getElementById('reminderTime');
+            
+            const medicineName = medicineInput.value.trim();
+            const time = reminderTime.value.trim();
+
+            if (medicineName === '' || time === '') {
+                alert('Please enter both medicine name and reminder time.');
+                return;
+            }
+
+            const medList = document.getElementById('medList');
+            const listItem = document.createElement('li');
+            listItem.className = 'medicine';
+            listItem.innerHTML = `
+                <span>${medicineName}</span>
+                <span>${time}</span>
+                <button onclick="setReminder('${medicineName}', '${time}')">Set Reminder</button>
+            `;
+            medList.appendChild(listItem);
+
+            medicineInput.value = '';
+            reminderTime.value = '';
+        }
+
+        function setReminder(medicineName, time) {
+            const currentTime = new Date();
+            const reminderTime = new Date(time);
+
+            if (reminderTime <= currentTime) {
+                // It's time to take the medicine
+                playAlarm();
+            } else {
+                // Schedule the alarm for the specified time
+                setTimeout(() => {
+                    playAlarm();
+                }, reminderTime - currentTime);
+            }
+        }
+
+        function playAlarm() {
+            const alarmAudio = document.getElementById('alarmAudio');
+            alarmAudio.play();
+        }
+    </script>
+</body>
+</html>
